@@ -259,7 +259,7 @@ public partial class CarEntity : Prop, IUse
 		}
 
 		AccelerationTilt = AccelerationTilt.LerpTo( targetTilt, 1.0f - MathF.Pow( 0.01f, dt ) );
-		TurnLean = TurnLean.LerpTo( targetLean, 1.0f - MathF.Pow( 0.01f, dt ) );
+		TurnLean = TurnLean.LerpTo( targetLean, 1.0f - MathF.Pow( 0.05f, dt ) );
 
 		if ( backWheelsOnGround )
 		{
@@ -304,7 +304,7 @@ public partial class CarEntity : Prop, IUse
 		}
 
 		var angularDamping = 0.0f;
-		angularDamping = angularDamping.LerpTo( 5.0f, grip );
+		angularDamping = angularDamping.LerpTo( 2.0f + (localVelocity.x / 250f).Clamp(0f, 1000f), grip );
 
 		body.LinearDamping = 0.0f;
 		body.AngularDamping = fullyGrounded ? angularDamping : 0.5f;
@@ -313,15 +313,15 @@ public partial class CarEntity : Prop, IUse
 		{
 			localVelocity = rotation.Inverse * body.Velocity;
 			WheelSpeed = localVelocity.x;
-			var turnAmount = frontWheelsOnGround ? (MathF.Sign( localVelocity.x ) * 25.0f * CalculateTurnFactor( TurnDirection, MathF.Abs( localVelocity.x ) ) * dt) : 0.0f;
+			var turnAmount = frontWheelsOnGround ? (MathF.Sign( localVelocity.x ) * 17.5f * CalculateTurnFactor( TurnDirection, MathF.Abs( localVelocity.x ) ) * dt) : 0.0f;
 			body.AngularVelocity += rotation * new Vector3( 0, 0, turnAmount );
 
 			airRoll = 0;
 			airTilt = 0;
 
 			var forwardGrip = 0.1f;
-			forwardGrip = forwardGrip.LerpTo( 0.9f, currentInput.breaking );
-			body.Velocity = VelocityDamping( Velocity, rotation, new Vector3( forwardGrip, grip, 0 ), dt );
+			forwardGrip = forwardGrip.LerpTo( 0.7f, currentInput.breaking ) - (body.AngularVelocity.x - 100f).Clamp( 0, 23.75f );
+			body.Velocity = VelocityDamping( Velocity, rotation, new Vector3( forwardGrip, grip - (body.AngularVelocity.x - 25f).Clamp( 0, 45.5f ), 0 ), dt );
 		}
 		else
 		{
@@ -554,7 +554,7 @@ public partial class CarEntity : Prop, IUse
 					.WithAttacker( driver != null ? driver : this, driver != null ? this : null )
 					.WithPosition( eventData.Pos )
 					.WithForce( eventData.PreVelocity ) );
-
+				
 				if ( eventData.Entity.LifeState == LifeState.Dead && eventData.Entity is not SandboxPlayer )
 				{
 					PhysicsBody.Velocity = eventData.PreVelocity;
