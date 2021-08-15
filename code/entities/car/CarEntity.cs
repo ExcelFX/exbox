@@ -8,7 +8,7 @@ public partial class CarEntity : Prop, IUse
 	public static bool debug_car { get; set; } = false;
 
 	[ConVar.Replicated( "car_accelspeed" )]
-	public static float car_accelspeed { get; set; } = 500.0f;
+	public static float car_accelspeed { get; set; } = 450.0f;
 
 	private CarWheel frontLeft;
 	private CarWheel frontRight;
@@ -66,6 +66,7 @@ public partial class CarEntity : Prop, IUse
 
 	[Net] public Player driver { get; private set; }
 
+	private ModelEntity vehicle_steering_wheel;
 	private ModelEntity chassis_axle_rear;
 	private ModelEntity chassis_axle_front;
 	private ModelEntity wheel0;
@@ -96,6 +97,7 @@ public partial class CarEntity : Prop, IUse
 		};
 
 		trigger.SetModel( modelName );
+		trigger.Transform = new Transform( new Vector3( 0, 0, -7.5f ) );
 		trigger.SetupPhysicsFromModel( PhysicsMotionType.Keyframed, false );
 	}
 
@@ -109,6 +111,14 @@ public partial class CarEntity : Prop, IUse
 			vehicle_fuel_tank.Transform = Transform;
 			vehicle_fuel_tank.Parent = this;
 			vehicle_fuel_tank.LocalPosition = new Vector3( 0.75f, 0, 0 ) * 40.0f;
+		}
+
+		{
+			vehicle_steering_wheel = new ModelEntity();
+			vehicle_steering_wheel.SetModel( "models/citizen_props/hotdog01.vmdl" );
+			vehicle_steering_wheel.Transform = Transform;
+			vehicle_steering_wheel.Parent = this;
+			vehicle_steering_wheel.LocalPosition = new Vector3( 20, 0, 40 );
 		}
 
 		{
@@ -241,8 +251,8 @@ public partial class CarEntity : Prop, IUse
 		accelerateDirection = currentInput.throttle.Clamp( -1, 1 ) * (1.0f - currentInput.breaking);
 		TurnDirection = TurnDirection.LerpTo( currentInput.turning.Clamp( -1, 1 ), 1.0f - MathF.Pow( 0.001f, dt ) );
 
-		airRoll = airRoll.LerpTo( currentInput.roll.Clamp( -1, 1 ), 1.0f - MathF.Pow( 0.0001f, dt ) );
-		airTilt = airTilt.LerpTo( currentInput.tilt.Clamp( -1, 1 ), 1.0f - MathF.Pow( 0.0001f, dt ) );
+		airRoll = airRoll.LerpTo( currentInput.roll.Clamp( -1, 1 ), 2.5f - MathF.Pow( 0.0001f, dt ) );
+		airTilt = airTilt.LerpTo( currentInput.tilt.Clamp( -1, 1 ), 2.0f - MathF.Pow( 0.0001f, dt ) );
 
 		float targetTilt = 0;
 		float targetLean = 0;
@@ -254,7 +264,7 @@ public partial class CarEntity : Prop, IUse
 			var forwardSpeed = MathF.Abs( localVelocity.x );
 			var speedFraction = MathF.Min( forwardSpeed / 500.0f, 1 );
 
-			targetTilt = accelerateDirection.Clamp( -1.0f, 1.0f );
+			targetTilt = accelerateDirection.Clamp( -49.0f, 49.0f );
 			targetLean = speedFraction * TurnDirection;
 		}
 
@@ -399,17 +409,17 @@ public partial class CarEntity : Prop, IUse
 	{
 		float forward = 42;
 		float right = 32;
+		float length = 25.0f;
 
-		var frontLeftPos = rotation.Forward * forward + rotation.Right * right + rotation.Up * 20;
-		var frontRightPos = rotation.Forward * forward - rotation.Right * right + rotation.Up * 20;
-		var backLeftPos = -rotation.Forward * forward + rotation.Right * right + rotation.Up * 20;
-		var backRightPos = -rotation.Forward * forward - rotation.Right * right + rotation.Up * 20;
+		var frontLeftPos = rotation.Forward * forward + rotation.Right * right + rotation.Up * (length - 10);
+		var frontRightPos = rotation.Forward * forward - rotation.Right * right + rotation.Up * (length - 10);
+		var backLeftPos = -rotation.Forward * forward + rotation.Right * right + rotation.Up * (length - 10);
+		var backRightPos = -rotation.Forward * forward - rotation.Right * right + rotation.Up * (length - 10);
 
 		var tiltAmount = AccelerationTilt * 2.5f;
 		var leanAmount = TurnLean * 2.5f;
 
-		float length = 20.0f;
-
+		
 		frontWheels =
 			frontLeft.Raycast( length + tiltAmount - leanAmount, doPhysics, frontLeftPos * Scale, ref frontLeftDistance, dt ) |
 			frontRight.Raycast( length + tiltAmount + leanAmount, doPhysics, frontRightPos * Scale, ref frontRightDistance, dt );
@@ -421,6 +431,7 @@ public partial class CarEntity : Prop, IUse
 
 	float wheelAngle = 0.0f;
 	float wheelRevolute = 0.0f;
+	float steerAngle = 0.0f;
 
 	[Event.Frame]
 	public void OnFrame()
@@ -432,14 +443,25 @@ public partial class CarEntity : Prop, IUse
 		var wheelRotLeft = Rotation.From( wheelAngle, 0, wheelRevolute );
 		var wheelRotBackRight = Rotation.From( 0, 90, -wheelRevolute );
 		var wheelRotBackLeft = Rotation.From( 0, -90, wheelRevolute );
+		var steeringWheelRot = Rotation.From( 0, 90f + wheelAngle * 10f, 0 );
 
 		RaycastWheels( Rotation, false, out _, out _, Time.Delta );
 
-		float frontOffset = 20.0f - Math.Min( frontLeftDistance, frontRightDistance );
-		float backOffset = 20.0f - Math.Min( backLeftDistance, backRightDistance );
+		float frontOffset = 15f - Math.Min( frontLeftDistance, frontRightDistance );
+		float backOffset = 15f - Math.Min( backLeftDistance, backRightDistance );
+
+		float frontAxleOffset = frontLeftDistance - frontRightDistance;
+		float rearAxleOffset = backLeftDistance - backRightDistance;
+
+		var axleRotFront = Rotation.From( 0, 0, frontAxleOffset );
+		var axleRotRear = Rotation.From( 0, 0, rearAxleOffset );
+
+		vehicle_steering_wheel.LocalRotation = steeringWheelRot;
 
 		chassis_axle_front.SetBoneTransform( "Axle_front_Center", new Transform( Vector3.Up * frontOffset ), false );
 		chassis_axle_rear.SetBoneTransform( "Axle_Rear_Center", new Transform( Vector3.Up * backOffset ), false );
+		chassis_axle_front.LocalRotation = axleRotFront;
+		chassis_axle_rear.LocalRotation = axleRotRear;
 
 		wheel0.LocalRotation = wheelRotRight;
 		wheel1.LocalRotation = wheelRotLeft;

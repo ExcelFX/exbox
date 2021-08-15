@@ -59,14 +59,14 @@ struct CarWheel
 		_currentLength = (length * parent.Scale) - tr.Distance;
 
 		var springVelocity = (_currentLength - _previousLength) / dt;
-		var springForce = body.Mass * 50.0f * _currentLength;
-		var damperForce = body.Mass * (1.5f + (1.0f - tr.Fraction) * 3.0f) * springVelocity;
+		var springForce = body.Mass * 25.0f * _currentLength; //50.0f
+		var damperForce = body.Mass * (1.5f + (1.0f - tr.Fraction) * 2.0f) * springVelocity; //3.0f
 		var velocity = body.GetVelocityAtPoint( wheelAttachPos );
 		var speed = velocity.Length;
 		var speedDot = MathF.Abs( speed ) > 0.0f ? MathF.Abs( MathF.Min( Vector3.Dot( velocity, rotation.Up.Normal ) / speed, 0.0f ) ) : 0.0f;
 		var speedAlongNormal = speedDot * speed;
 		var correctionMultiplier = (1.0f - tr.Fraction) * (speedAlongNormal / 1000.0f);
-		var correctionForce = correctionMultiplier * 50.0f * speedAlongNormal / dt;
+		var correctionForce = correctionMultiplier * 35.0f * speedAlongNormal / dt; //50.0f
 
 		body.ApplyImpulseAt( wheelAttachPos, tr.Normal * (springForce + damperForce + correctionForce) * dt );
 
