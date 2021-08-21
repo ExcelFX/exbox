@@ -24,6 +24,7 @@ partial class Pistol : Weapon
 
 	public override void AttackPrimary()
 	{
+
 		TimeSincePrimaryAttack = 0;
 		TimeSinceSecondaryAttack = 0;
 		

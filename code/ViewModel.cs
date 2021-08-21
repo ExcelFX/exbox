@@ -6,7 +6,7 @@ public class ViewModel : BaseViewModel
 	protected float ReturnSpeed => 5.0f;
 	protected float MaxOffsetLength => 10.0f;
 	protected float BobCycleTime => 7;
-	protected Vector3 BobDirection => new Vector3( 0.0f, 1.0f, 0.5f );
+	protected Vector3 BobDirection => new Vector3( 0.0f, 0.75f, 0.35f );
 
 	private Vector3 swingOffset;
 	private float lastPitch;

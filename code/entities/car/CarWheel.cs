@@ -18,6 +18,7 @@ struct CarWheel
 	public bool Raycast( float length, bool doPhysics, Vector3 offset, ref float wheel, float dt )
 	{
 		var position = parent.Position;
+		position.z = parent.Position.z + 2f;
 		var rotation = parent.Rotation;
 
 		var wheelAttachPos = position + offset;

@@ -1,0 +1,190 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc29:version{3cec427c-1b0e-4d48-a90a-0436f33a6041} -->
+{
+	rootNode = 
+	{
+		_class = "RootNode"
+		children = 
+		[
+			{
+				_class = "MaterialGroupList"
+				children = 
+				[
+					{
+						_class = "DefaultMaterialGroup"
+						remaps = 
+						[
+							{
+								from = "brake.vmat"
+								to = "materials/vehicles/lanciadelta/brake.vmat"
+							},
+							{
+								from = "delt_grill.vmat"
+								to = "materials/vehicles/lanciadelta/grill.vmat"
+							},
+							{
+								from = "tier.vmat"
+								to = "materials/vehicles/lanciadelta/tire.vmat"
+							},
+							{
+								from = "delt_interior.vmat"
+								to = "materials/vehicles/lanciadelta/interior.vmat"
+							},
+							{
+								from = "material #912.vmat"
+								to = "materials/vehicles/lanciadelta/rim_color.vmat"
+							},
+							{
+								from = "delt_bottom.vmat"
+								to = "materials/vehicles/lanciadelta/bottom.vmat"
+							},
+							{
+								from = "rim_colour.vmat"
+								to = "materials/vehicles/lanciadelta/rim_color.vmat"
+							},
+							{
+								from = "delt_glass.vmat"
+								to = "materials/vehicles/lanciadelta/doorshut.vmat"
+							},
+							{
+								from = "delt_coil.vmat"
+								to = "materials/vehicles/lanciadelta/coil.vmat"
+							},
+							{
+								from = "delt_headlights.vmat"
+								to = "materials/vehicles/lanciadelta/headlights.vmat"
+							},
+							{
+								from = "delt_body.vmat"
+								to = "materials/vehicles/lanciadelta/body.vmat"
+							},
+							{
+								from = "delt_doorshut.vmat"
+								to = "materials/vehicles/lanciadelta/body.vmat"
+							},
+							{
+								from = "delt_chrome.vmat"
+								to = "materials/vehicles/lanciadelta/rim_color.vmat"
+							},
+						]
+						use_global_default = false
+						global_default_material = ""
+					},
+				]
+			},
+			{
+				_class = "PhysicsShapeList"
+				note = "Type note..."
+				children = 
+				[
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_prop = "default"
+						origin = [ -2.72502, 0.0, 27.0 ]
+						angles = [ 0.0, 0.0, 0.0 ]
+						dimensions = [ 143.058075, 55.452515, 20.0 ]
+					},
+					{
+						_class = "PhysicsShapeCapsule"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_prop = "default"
+						radius = 19.645309
+						point0 = [ -60.0, -12.0, 40.0 ]
+						point1 = [ 13.0, -12.0, 40.0 ]
+					},
+					{
+						_class = "PhysicsShapeCapsule"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_prop = "default"
+						radius = 19.645309
+						point0 = [ -60.0, 12.0, 40.0 ]
+						point1 = [ 13.0, 12.0, 40.0 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_prop = "default"
+						origin = [ -26.0, 0.0, 47.0 ]
+						angles = [ 0.0, 0.0, 0.0 ]
+						dimensions = [ 61.0, 44.0, 24.0 ]
+					},
+					{
+						_class = "PhysicsShapeCapsule"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_prop = "default"
+						radius = 11.031512
+						point0 = [ 70.0, 25.0, 25.0 ]
+						point1 = [ 70.0, -25.0, 25.0 ]
+					},
+					{
+						_class = "PhysicsShapeCapsule"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_prop = "default"
+						radius = 11.031512
+						point0 = [ -75.0, 25.0, 25.0 ]
+						point1 = [ -75.0, -25.0, 25.0 ]
+					},
+					{
+						_class = "PhysicsShapeCapsule"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_prop = "default"
+						radius = 11.031512
+						point0 = [ -75.0, 25.0, 25.0 ]
+						point1 = [ 70.0, 25.0, 25.0 ]
+					},
+					{
+						_class = "PhysicsShapeCapsule"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_prop = "default"
+						radius = 11.031512
+						point0 = [ -75.0, -25.0, 25.0 ]
+						point1 = [ 70.0, -25.0, 25.0 ]
+					},
+				]
+			},
+			{
+				_class = "RenderMeshList"
+				children = 
+				[
+					{
+						_class = "RenderMeshFile"
+						filename = "SOURCEFILES/italian-group-4-hot-hatch-low-poly-model/source/delthf.fbx"
+						import_translation = [ 0.0, 0.0, 10.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.1
+						align_origin_x_type = "BoundsCenter"
+						align_origin_y_type = "None"
+						align_origin_z_type = "BoundsMin"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = 
+							[
+								"Mesh_026",
+								"Mesh_025",
+								"Mesh_024",
+								"Mesh_023",
+								"Mesh_022",
+								"Mesh_021",
+								"Mesh_020",
+								"Mesh_019",
+							]
+						}
+					},
+				]
+			},
+		]
+		model_archetype = "default"
+		primary_associated_entity = ""
+		anim_graph_name = ""
+	}
+}

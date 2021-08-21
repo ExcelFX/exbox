@@ -66,9 +66,12 @@ public partial class CarEntity : Prop, IUse
 
 	[Net] public Player driver { get; private set; }
 
+	private ModelEntity vehicle_steering_wheel_base;
 	private ModelEntity vehicle_steering_wheel;
 	private ModelEntity chassis_axle_rear;
 	private ModelEntity chassis_axle_front;
+	private ModelEntity wheel0_steering;
+	private ModelEntity wheel1_steering;
 	private ModelEntity wheel0;
 	private ModelEntity wheel1;
 	private ModelEntity wheel2;
@@ -79,7 +82,6 @@ public partial class CarEntity : Prop, IUse
 		base.Spawn();
 
 		var modelName = "models/car/car.vmdl";
-
 		SetModel( modelName );
 		SetupPhysicsFromModel( PhysicsMotionType.Dynamic, false );
 		SetInteractsExclude( CollisionLayer.Player );
@@ -93,10 +95,11 @@ public partial class CarEntity : Prop, IUse
 			EnableTouch = true,
 			CollisionGroup = CollisionGroup.Trigger,
 			Transmit = TransmitType.Never,
-			EnableSelfCollisions = false,
+			EnableSelfCollisions = true,
 		};
 
 		trigger.SetModel( modelName );
+		trigger.Scale = 1.3f;
 		trigger.Transform = new Transform( new Vector3( 0, 0, -7.5f ) );
 		trigger.SetupPhysicsFromModel( PhysicsMotionType.Keyframed, false );
 	}
@@ -104,7 +107,7 @@ public partial class CarEntity : Prop, IUse
 	public override void ClientSpawn()
 	{
 		base.ClientSpawn();
-
+		var wheelModel = "models/citizen_props/wheel02.vmdl"; //"entities/modular_vehicle/wheel_a.vmdl"
 		{
 			var vehicle_fuel_tank = new ModelEntity();
 			vehicle_fuel_tank.SetModel( "entities/modular_vehicle/vehicle_fuel_tank.vmdl" );
@@ -114,11 +117,29 @@ public partial class CarEntity : Prop, IUse
 		}
 
 		{
-			vehicle_steering_wheel = new ModelEntity();
-			vehicle_steering_wheel.SetModel( "models/citizen_props/hotdog01.vmdl" );
-			vehicle_steering_wheel.Transform = Transform;
-			vehicle_steering_wheel.Parent = this;
-			vehicle_steering_wheel.LocalPosition = new Vector3( 20, 0, 40 );
+			var vehicle_hotdog = new ModelEntity();
+			vehicle_hotdog.SetModel( "models/citizen_props/hotdog01.vmdl" );
+			vehicle_hotdog.Transform = Transform;
+			vehicle_hotdog.Parent = this;
+			vehicle_hotdog.LocalPosition = new Vector3( 0, 0, 13 );
+			vehicle_hotdog.Scale = 6f;
+		}
+
+		{
+			vehicle_steering_wheel_base = new ModelEntity();
+			vehicle_steering_wheel_base.SetModel( "models/light_arrow.vmdl" );
+			vehicle_steering_wheel_base.Transform = Transform;
+			vehicle_steering_wheel_base.Parent = this;
+			vehicle_steering_wheel_base.LocalPosition = new Vector3( 20, 0, 40 );
+			vehicle_steering_wheel_base.LocalRotation = Rotation.From( -65, 0, 0 );
+			vehicle_steering_wheel_base.Scale = 0f;
+
+			{
+				vehicle_steering_wheel = new ModelEntity();
+				vehicle_steering_wheel.SetModel( "models/citizen_props/hotdog01.vmdl" );
+				vehicle_steering_wheel.SetParent( vehicle_steering_wheel_base, "Steering_Wheel", new Transform( Vector3.Zero, Rotation.From( 0, 0, 0 ) ) );
+				vehicle_steering_wheel.Scale = 1f;
+			}
 		}
 
 		{
@@ -129,15 +150,33 @@ public partial class CarEntity : Prop, IUse
 			chassis_axle_front.LocalPosition = new Vector3( 1.05f, 0, 0.35f ) * 40.0f;
 
 			{
-				wheel0 = new ModelEntity();
-				wheel0.SetModel( "entities/modular_vehicle/wheel_a.vmdl" );
-				wheel0.SetParent( chassis_axle_front, "Wheel_Steer_R", new Transform( Vector3.Zero, Rotation.From( 0, 180, 0 ) ) );
+				wheel0_steering = new ModelEntity();
+				wheel0_steering.SetModel( "models/ball/ball.vmdl" ); //models/light_arrow.vmdl
+				wheel0_steering.SetParent( chassis_axle_front, "Wheel_Steer_R", new Transform( Vector3.Zero, Rotation.From( 0, 180, 0 ) ) );
+				wheel0_steering.RenderColorAndAlpha = new Color32(255, 255, 255, 0);
+				wheel0_steering.LocalScale = 0.25f;
+				//wheel0_steering.LocalPosition = new Vector3( -4f, 0f, 0f );
+				{
+					wheel0 = new ModelEntity();
+					wheel0.SetModel( wheelModel );
+					wheel0.SetParent( wheel0_steering, "Wheel_Front_R", new Transform( Vector3.Zero, Rotation.From( 0, 180, 0 ) ) );
+					wheel0.LocalScale = 0.9f * 4f;
+				}
 			}
 
 			{
-				wheel1 = new ModelEntity();
-				wheel1.SetModel( "entities/modular_vehicle/wheel_a.vmdl" );
-				wheel1.SetParent( chassis_axle_front, "Wheel_Steer_L", new Transform( Vector3.Zero, Rotation.From( 0, 0, 0 ) ) );
+				wheel1_steering = new ModelEntity();
+				wheel1_steering.SetModel( "models/ball/ball.vmdl" ); //models/light_arrow.vmdl
+				wheel1_steering.SetParent( chassis_axle_front, "Wheel_Steer_L", new Transform( Vector3.Zero, Rotation.From( 0, 0, 0 ) ) );
+				wheel1_steering.RenderColorAndAlpha = new Color32( 255, 255, 255, 0 );
+				wheel1_steering.Scale = 0.25f;
+				//wheel1_steering.LocalPosition = new Vector3( 4f, 0f, 0f );
+				{
+					wheel1 = new ModelEntity();
+					wheel1.SetModel( wheelModel );
+					wheel1.SetParent( wheel1_steering, "Wheel_Front_L", new Transform( Vector3.Zero, Rotation.From( 0, 0, 0 ) ) );
+					wheel1.LocalScale = 0.9f * 4f;
+				}
 			}
 
 			{
@@ -162,14 +201,18 @@ public partial class CarEntity : Prop, IUse
 
 			{
 				wheel2 = new ModelEntity();
-				wheel2.SetModel( "entities/modular_vehicle/wheel_a.vmdl" );
+				wheel2.SetModel( wheelModel );
 				wheel2.SetParent( chassis_axle_rear, "Axle_Rear_Center", new Transform( Vector3.Left * (0.7f * 40), Rotation.From( 0, 90, 0 ) ) );
+				wheel2.LocalScale = 0.9f;
+				//wheel2.LocalPosition = Position;
 			}
 
 			{
 				wheel3 = new ModelEntity();
-				wheel3.SetModel( "entities/modular_vehicle/wheel_a.vmdl" );
+				wheel3.SetModel( wheelModel );
 				wheel3.SetParent( chassis_axle_rear, "Axle_Rear_Center", new Transform( Vector3.Right * (0.7f * 40), Rotation.From( 0, -90, 0 ) ) );
+				wheel3.LocalScale = 0.9f;
+				//wheel3.LocalPosition = Position;
 			}
 		}
 	}
@@ -314,23 +357,23 @@ public partial class CarEntity : Prop, IUse
 		}
 
 		var angularDamping = 0.0f;
-		angularDamping = angularDamping.LerpTo( 2.0f + (localVelocity.x / 250f).Clamp(0f, 1000f), grip );
+		angularDamping = angularDamping.LerpTo( 2.0f - (localVelocity.x / 2000f - 250f).Clamp(0f, 100f) * MathF.Sign( MathF.Floor(localVelocity.x)), grip );
 
 		body.LinearDamping = 0.0f;
-		body.AngularDamping = fullyGrounded ? angularDamping : 0.5f;
+		body.AngularDamping = fullyGrounded ? angularDamping : 0.7f;
 
 		if ( onGround )
 		{
 			localVelocity = rotation.Inverse * body.Velocity;
 			WheelSpeed = localVelocity.x;
-			var turnAmount = frontWheelsOnGround ? (MathF.Sign( localVelocity.x ) * 17.5f * CalculateTurnFactor( TurnDirection, MathF.Abs( localVelocity.x ) ) * dt) : 0.0f;
+			var turnAmount = frontWheelsOnGround ? (MathF.Sign( localVelocity.x ) * 15.0f * CalculateTurnFactor( TurnDirection, MathF.Abs( localVelocity.x ) ) * dt) : 0.0f;
 			body.AngularVelocity += rotation * new Vector3( 0, 0, turnAmount );
 
 			airRoll = 0;
 			airTilt = 0;
 
 			var forwardGrip = 0.1f;
-			forwardGrip = forwardGrip.LerpTo( 0.7f, currentInput.breaking ) - (body.AngularVelocity.x - 100f).Clamp( 0, 23.75f );
+			forwardGrip = forwardGrip.LerpTo( 0.9f, currentInput.breaking ) - (body.AngularVelocity.x - 100f).Clamp( 0, 23.75f );
 			body.Velocity = VelocityDamping( Velocity, rotation, new Vector3( forwardGrip, grip - (body.AngularVelocity.x - 25f).Clamp( 0, 45.5f ), 0 ), dt );
 		}
 		else
@@ -361,7 +404,7 @@ public partial class CarEntity : Prop, IUse
 
 			if ( currentInput.roll.Clamp( -1, 1 ) != 0 )
 			{
-				var force = tr.Hit ? 400.0f : 100.0f;
+				var force = tr.Hit ? 600.0f : 100.0f;
 				var roll = tr.Hit ? currentInput.roll.Clamp( -1, 1 ) : airRoll;
 				body.ApplyForceAt( selfBody.MassCenter + rotation.Left * (offset * roll), (rotation.Down * roll) * (roll * (body.Mass * force)) );
 
@@ -408,7 +451,7 @@ public partial class CarEntity : Prop, IUse
 	private void RaycastWheels( Rotation rotation, bool doPhysics, out bool frontWheels, out bool backWheels, float dt )
 	{
 		float forward = 42;
-		float right = 32;
+		float right = 34; //32
 		float length = 25.0f;
 
 		var frontLeftPos = rotation.Forward * forward + rotation.Right * right + rotation.Up * (length - 10);
@@ -431,7 +474,6 @@ public partial class CarEntity : Prop, IUse
 
 	float wheelAngle = 0.0f;
 	float wheelRevolute = 0.0f;
-	float steerAngle = 0.0f;
 
 	[Event.Frame]
 	public void OnFrame()
@@ -439,10 +481,12 @@ public partial class CarEntity : Prop, IUse
 		wheelAngle = wheelAngle.LerpTo( TurnDirection * 25, 1.0f - MathF.Pow( 0.001f, Time.Delta ) );
 		wheelRevolute += (WheelSpeed / (14.0f * Scale)).RadianToDegree() * Time.Delta;
 
-		var wheelRotRight = Rotation.From( -wheelAngle, 180, -wheelRevolute );
-		var wheelRotLeft = Rotation.From( wheelAngle, 0, wheelRevolute );
-		var wheelRotBackRight = Rotation.From( 0, 90, -wheelRevolute );
-		var wheelRotBackLeft = Rotation.From( 0, -90, wheelRevolute );
+		var wheelSteeringR = Rotation.From( wheelAngle, 0, 0 );
+		var wheelSteeringL = Rotation.From( wheelAngle - 180, 0, 0 );
+		var wheelRotRight = Rotation.From( wheelRevolute, -90, 0 );  //Rotation.From( -wheelAngle, 180, -wheelRevolute );
+		var wheelRotLeft = Rotation.From( -wheelRevolute, -90, 0 ); //Rotation.From( wheelAngle, 0, wheelRevolute );
+		var wheelRotBackRight = Rotation.From( wheelRevolute, 180, 0 ); //Rotation.From( 0, 90, -wheelRevolute );
+		var wheelRotBackLeft = Rotation.From( -wheelRevolute + 180, 0, 0 ); //Rotation.From( 0, -90, wheelRevolute );
 		var steeringWheelRot = Rotation.From( 0, 90f + wheelAngle * 10f, 0 );
 
 		RaycastWheels( Rotation, false, out _, out _, Time.Delta );
@@ -462,6 +506,9 @@ public partial class CarEntity : Prop, IUse
 		chassis_axle_rear.SetBoneTransform( "Axle_Rear_Center", new Transform( Vector3.Up * backOffset ), false );
 		chassis_axle_front.LocalRotation = axleRotFront;
 		chassis_axle_rear.LocalRotation = axleRotRear;
+
+		wheel0_steering.LocalRotation = wheelSteeringR;
+		wheel1_steering.LocalRotation = wheelSteeringL;
 
 		wheel0.LocalRotation = wheelRotRight;
 		wheel1.LocalRotation = wheelRotLeft;
